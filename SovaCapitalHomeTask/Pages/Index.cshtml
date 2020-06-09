@@ -1,0 +1,34 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Список сообщений от сервера";
+}
+
+<div class="text-center">
+    <ul class="list-group messages">
+    </ul>
+</div>
+
+<script src="js/signalr/dist/browser/signalr.min.js"></script>
+
+<script>
+    const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/messageHub")
+        .build();
+
+    hubConnection.start();
+
+    hubConnection.on("GetAllMessages", function (messages) {
+        for (const message of messages){
+            PrependMessage(message.text);
+        }
+    });
+ 
+    hubConnection.on("GetNewMessage", function (message) {
+        PrependMessage(message.text);
+    });
+
+    function PrependMessage(text){
+        $(".messages").prepend(`<li class="list-group-item">${text}</li>`);
+    }
+</script>
